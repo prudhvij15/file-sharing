@@ -2,30 +2,49 @@ const multer = require("multer");
 const Item = require("../model/Item.js");
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
+  destination(req, file, cb) {
+    cb(null, "../server/uploadedFiles"); // Set the destination folder where files will be saved
   },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
+  filename(req, file, cb) {
+    cb(null, `${new Date().getTime()}__${file.originalname}`);
   },
 });
-const upload = multer({ storage: storage });
 
-module.exports.uploadFile = async (req, res) => {
-  try {
-    const newItem = new Item({
-      name: req.body.name,
-      description: req.body.description,
-    });
+const upload = multer({ storage });
 
-    await newItem.save();
+const uploadFileHandler = (req, res) => {
+  upload.single("file")(req, res, async (err) => {
+    try {
+      if (err instanceof multer.MulterError) {
+        return res.status(400).json({ message: "Multer error", error: err });
+      } else if (err) {
+        return res.status(500).json({ message: "Error", error: err });
+      }
 
-    res
-      .status(201)
-      .json({ message: "File uploaded successfully", item: newItem });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to upload filewwww", error: error.message });
-  }
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const newItem = new Item({
+        file_name: req.file.originalname,
+        file_location: req.file.destination,
+        file_mimetype: req.file.mimetype,
+        file_key: req.file.filename,
+      });
+
+      await newItem.save();
+
+      res
+        .status(201)
+        .json({ message: "File uploaded successfully", item: newItem });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Failed to upload file", error: error.message });
+    }
+  });
+};
+
+module.exports = {
+  uploadFileHandler,
 };

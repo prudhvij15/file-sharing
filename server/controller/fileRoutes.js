@@ -6,7 +6,7 @@ const uploadController = require("./uploadController.js");
 const fileController = require("./fileController.js");
 const fileDeletion = require("./fileDeletion.js");
 
-router.post("/upload", uploadController.uploadFile);
+router.post("/upload", uploadController.uploadFileHandler);
 
 router.get("/files/:id", fileController.getFile);
 
