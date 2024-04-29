@@ -1,18 +1,20 @@
 const multer = require("multer");
+const Aws = require("aws-sdk");
+const { v4: uuidv4 } = require("uuid");
 const Item = require("../model/Item.js");
+const { generateFilename } = require("./filename.js");
 
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, "../server/uploadedFiles"); // Set the destination folder where files will be saved
-  },
-  filename(req, file, cb) {
-    cb(null, `${new Date().getTime()}__${file.originalname}`);
-  },
-});
-
+// Configure multer to handle file uploads
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-const uploadFileHandler = (req, res) => {
+// Create an instance of the AWS SDK
+const s3 = new Aws.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_ACCESS_KEY_SECRET,
+});
+
+const uploadFileHandler = async (req, res) => {
   upload.single("file")(req, res, async (err) => {
     try {
       if (err instanceof multer.MulterError) {
@@ -24,19 +26,31 @@ const uploadFileHandler = (req, res) => {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
+      const filename = generateFilename(req.file.originalname);
+      // Upload file to S3
+      const params = {
+        apiVersion: "latest",
+        Bucket: process.env.AWS_BUCKET_NAME,
+        region: process.env.AWS_REGION,
+        Key: filename,
+        Body: req.file.buffer,
+      };
 
+      await s3.upload(params).promise();
+      const fileUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}`;
+
+      // Create a new item in the database with file details
       const newItem = new Item({
         file_name: req.file.originalname,
-        file_location: req.file.destination,
+        file_location: fileUrl, // Store the URL of the uploaded file
         file_mimetype: req.file.mimetype,
-        file_key: req.file.filename,
+        file_key: filename, // Store the filename in the database
       });
 
       await newItem.save();
-
       res
         .status(201)
-        .json({ message: "File uploaded successfully", item: newItem });
+        .json({ message: "File uploaded successfully", file_info: newItem });
     } catch (error) {
       res
         .status(500)
