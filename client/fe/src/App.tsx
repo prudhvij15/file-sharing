@@ -1,4 +1,3 @@
-import "./App.css";
 import FileUploadComponent from "./components/FileUploader";
 import Header from "./components/Header";
 
