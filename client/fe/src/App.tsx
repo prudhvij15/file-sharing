@@ -1,12 +1,25 @@
-import FileUploadComponent from "./components/FileUploader";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
+import Login from "./components/login/form";
+import Register from "./components/login/signup";
+import ProtectedRoute from "./components/ProtectedRoute/Protected";
 
 function App() {
   return (
-    <div className="App bg-gray-00">
-      <Header />
-      <FileUploadComponent />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <Header />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

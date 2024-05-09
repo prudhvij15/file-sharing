@@ -1,9 +1,20 @@
-exports.getFile = async (req, res) => {
+const Item = require("../model/Item.js");
+
+const getFile = async (req, res) => {
+  const userId = req.user.id; // Assuming the user ID is stored in req.user
+
   try {
-    res.status(200).json({ message: "File retrieved successfully" });
+    // Query the database for files associated with the logged-in user
+    const files = await Item.find({ user: userId });
+
+    // Return the files as a response
+    res.status(200).json({ files });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to retrieve file", error: error.message });
+    console.error("Error retrieving files:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
+};
+
+module.exports = {
+  getFile,
 };

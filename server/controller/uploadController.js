@@ -4,17 +4,19 @@ const { v4: uuidv4 } = require("uuid");
 const Item = require("../model/Item.js");
 const { generateFilename } = require("./filename.js");
 
-// Configure multer to handle file uploads
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Create an instance of the AWS SDK
 const s3 = new Aws.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_ACCESS_KEY_SECRET,
 });
 
 const uploadFileHandler = async (req, res) => {
+  console.log("req.user:", req.user);
+
+  const userID = req.user.id; // Use req.user.id to access the userId
+  console.log("userID:", userID);
   upload.single("file")(req, res, async (err) => {
     try {
       if (err instanceof multer.MulterError) {
@@ -42,11 +44,11 @@ const uploadFileHandler = async (req, res) => {
       // Create a new item in the database with file details
       const newItem = new Item({
         file_name: req.file.originalname,
-        file_location: fileUrl, // Store the URL of the uploaded file
+        file_location: fileUrl,
         file_mimetype: req.file.mimetype,
-        file_key: filename, // Store the filename in the database
+        file_key: filename,
+        user: userID, // Associate file with user
       });
-
       await newItem.save();
       res
         .status(201)
