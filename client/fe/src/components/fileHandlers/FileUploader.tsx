@@ -3,7 +3,7 @@ import axios from "axios";
 import FileList from "./filesView";
 import FilePreview from "./previewfile";
 
-const FileUploadComponent: React.FC = () => {
+const FileUploadComponent = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState<boolean>(false);
   const [previewData, setPreviewData] = useState<string | null>(null);
@@ -64,16 +64,14 @@ const FileUploadComponent: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 gap-10 lg:w-3/4 xl:w-2/3">
+    <div className="container mx-auto p-4 gap-10 w-screen bg-gray-200">
       <div className="flex">
         <div className="w-1/3 pr-2">
-          <h2 className="text-xl font-semibold mb-2">Your Files</h2>
-
           <FileList />
         </div>
 
         {/* File upload */}
-        <div className="w-2x/3 pr-2">
+        <div className="w-1/3 pr-2">
           <h2 className="text-xl font-semibold mb-2">Upload File</h2>
           <div className="flex items-center mb-4">
             <input type="file" onChange={handleFileChange} className="mr-2" />

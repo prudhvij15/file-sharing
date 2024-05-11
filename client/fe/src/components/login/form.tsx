@@ -7,7 +7,7 @@ interface LoginData {
   password: string;
 }
 
-const LoginForm: React.FC = () => {
+const LoginForm = () => {
   const [loginData, setLoginData] = useState<LoginData>({
     email: "",
     password: "",
