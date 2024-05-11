@@ -36,6 +36,8 @@ const uploadFileHandler = async (req, res) => {
         region: process.env.AWS_REGION,
         Key: filename,
         Body: req.file.buffer,
+        ContentType: req.file.mimetype,
+        ContentDisposition: "inline",
       };
 
       await s3.upload(params).promise();

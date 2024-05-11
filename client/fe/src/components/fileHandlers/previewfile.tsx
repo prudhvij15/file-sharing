@@ -5,12 +5,9 @@ interface FilePreviewProps {
   selectedFile: File | null;
 }
 
-const FilePreview: React.FC<FilePreviewProps> = ({
-  previewData,
-  selectedFile,
-}) => {
+const FilePreview = ({ previewData, selectedFile }: FilePreviewProps) => {
   return (
-    <div className="w-5/6 pl-2">
+    <div className="w-4/6 pl-2">
       <h2 className="text-xl font-semibold mb-2">Preview</h2>
       <div className="flex justify-center w-full h-[80vh]">
         {selectedFile && selectedFile.type.startsWith("image/") ? (
