@@ -11,6 +11,7 @@ const FileUploadComponent = () => {
     name: string;
     Link: string;
     type: string;
+    signed_url: string;
   } | null>(null);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -31,8 +32,6 @@ const FileUploadComponent = () => {
   const handleUpload = async () => {
     if (!selectedFile) return;
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", selectedFile);
 
     try {
       const token = localStorage.getItem("token"); // Retrieve JWT token from local storage
@@ -40,21 +39,31 @@ const FileUploadComponent = () => {
         throw new Error("No token found");
       }
 
-      const response = await axios.post(
-        "http://localhost:3001/api/upload",
-        formData,
+      // Fetch presigned URL from backend
+      const presignedUrlResponse = await axios.post(
+        "http://localhost:3001/api/get-presigned-url",
+        { fileType: selectedFile.type, filename: selectedFile.name },
         {
           headers: {
-            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`, // Include the JWT token in the request headers
           },
         }
       );
-      console.log(response);
+      console.log(selectedFile.name);
+
+      // Upload file directly to S3 using presigned URL
+      await axios.put(presignedUrlResponse.data.url, selectedFile, {
+        headers: {
+          "Content-Type": selectedFile.type,
+        },
+      });
+
+      // Update file details
       setFileDetails({
-        name: response.data.file_info.file_name,
-        Link: response.data.file_info.file_location,
-        type: response.data.file_info.file_mimetype,
+        name: selectedFile.name,
+        Link: presignedUrlResponse.data.fileUrl,
+        type: selectedFile.type,
+        signed_url: presignedUrlResponse.data.url,
       });
     } catch (error) {
       console.error("Failed to upload file:", error);
@@ -74,7 +83,12 @@ const FileUploadComponent = () => {
         <div className="w-1/3 pr-2">
           <h2 className="text-xl font-semibold mb-2">Upload File</h2>
           <div className="flex items-center mb-4">
-            <input type="file" onChange={handleFileChange} className="mr-2" />
+            <input
+              type="file"
+              name="file"
+              onChange={handleFileChange}
+              className="mr-2"
+            />
             <button
               onClick={handleUpload}
               disabled={!selectedFile || uploading}
@@ -88,7 +102,7 @@ const FileUploadComponent = () => {
               <h2 className="text-xl font-semibold mb-2">File Details</h2>
               <p>Name: {fileDetails.name}</p>
               <a href={fileDetails.Link} className="hover:text-gray-300">
-                <p>Size: {fileDetails.Link} bytes</p>
+                <p>File Link: {fileDetails.Link} bytes</p>
               </a>
               <p>Type: {fileDetails.type}</p>
             </div>

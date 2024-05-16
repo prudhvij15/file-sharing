@@ -7,6 +7,7 @@ const authenticateUser = async (req, res, next) => {
   }
 
   console.log(process.env.JWT_SECRET);
+
   try {
     const decoded = jwt.verify(token.split(" ")[1], process.env.JWT_SECRET);
     console.log(decoded);

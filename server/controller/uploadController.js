@@ -7,62 +7,55 @@ const { generateFilename } = require("./filename.js");
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-const s3 = new Aws.S3({
+Aws.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_ACCESS_KEY_SECRET,
+  region: "us-east-2",
+  forcePathStyle: true,
 });
+const s3 = new Aws.S3();
 
-const uploadFileHandler = async (req, res) => {
-  console.log("req.user:", req.user);
+const getPresignedUrl = async (req, res) => {
+  try {
+    const userID = req.user.id;
+    const fileType = req.body.fileType;
+    console.log(fileType);
+    console.log(userID);
+    // Generate a unique identifier for the file
+    const fileId = uuidv4();
+    const filename = `${userID}/${fileId}`;
 
-  const userID = req.user.id; // Use req.user.id to access the userId
-  console.log("userID:", userID);
-  upload.single("file")(req, res, async (err) => {
-    try {
-      if (err instanceof multer.MulterError) {
-        return res.status(400).json({ message: "Multer error", error: err });
-      } else if (err) {
-        return res.status(500).json({ message: "Error", error: err });
-      }
+    // Configure parameters for generating presigned URL
+    const params = {
+      Bucket: "filemanager1",
+      Key: `uploads/${filename}`, // Key is the path to the file in the bucket
+      Expires: 600, // URL expires in 10 minutes (600 seconds)
+      ContentType: fileType,
+    };
 
-      if (!req.file) {
-        return res.status(400).json({ message: "No file uploaded" });
-      }
-      const filename = generateFilename(req.file.originalname);
-      // Upload file to S3
-      const params = {
-        apiVersion: "latest",
-        Bucket: process.env.AWS_BUCKET_NAME,
-        region: process.env.AWS_REGION,
-        Key: filename,
-        Body: req.file.buffer,
-        ContentType: req.file.mimetype,
-        ContentDisposition: "inline",
-      };
+    // Generate presigned URL
+    const url = await s3.getSignedUrlPromise("putObject", params);
+    console.log(url);
 
-      await s3.upload(params).promise();
-      const fileUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${filename}`;
+    const fileUrl = `https://filemanager1.s3.amazonaws.com/uploads/${filename}`;
+    console.log(fileUrl);
+    // Store fileId along with file details in your database
+    const newItem = new Item({
+      // fileId: fileId,
+      file_location: fileUrl,
+      file_mimetype: fileType,
+      file_name: req.body.filename,
+      user: userID,
+    });
+    await newItem.save();
 
-      // Create a new item in the database with file details
-      const newItem = new Item({
-        file_name: req.file.originalname,
-        file_location: fileUrl,
-        file_mimetype: req.file.mimetype,
-        file_key: filename,
-        user: userID, // Associate file with user
-      });
-      await newItem.save();
-      res
-        .status(201)
-        .json({ message: "File uploaded successfully", file_info: newItem });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Failed to upload file", error: error.message });
-    }
-  });
+    res.json({ url, fileUrl });
+  } catch (error) {
+    console.error("Error generating presigned URL:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
 
 module.exports = {
-  uploadFileHandler,
+  getPresignedUrl,
 };
