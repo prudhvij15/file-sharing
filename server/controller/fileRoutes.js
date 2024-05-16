@@ -6,12 +6,17 @@ const fileDeletion = require("./fileDeletion.js");
 const authenticateUser = require("../middleware/authMiddleware.js");
 const userAuth = require("../controller/usercontroller/userAuth.js");
 
-router.post("/upload", authenticateUser, uploadController.uploadFileHandler);
+// router.post("/upload", authenticateUser, uploadController.uploadFileHandler);
 
 router.get("/files", authenticateUser, fileController.getFile);
 router.delete("/files/:id", authenticateUser, fileDeletion.deleteFile);
 
 router.post("/login", userAuth.user);
 router.post("/signup", userAuth.userCreate);
+router.post(
+  "/get-presigned-url",
+  authenticateUser,
+  uploadController.getPresignedUrl
+);
 
 module.exports = router;
