@@ -5,9 +5,7 @@ const fileController = require("./fileController.js");
 const fileDeletion = require("./fileDeletion.js");
 const authenticateUser = require("../middleware/authMiddleware.js");
 const userAuth = require("../controller/usercontroller/userAuth.js");
-
-// router.post("/upload", authenticateUser, uploadController.uploadFileHandler);
-
+const { profileImage, profilePicture, getProfile } = require("./profile.js");
 router.get("/files", authenticateUser, fileController.getFile);
 router.delete("/files/:id", authenticateUser, fileDeletion.deleteFile);
 
@@ -18,5 +16,7 @@ router.post(
   authenticateUser,
   uploadController.getPresignedUrl
 );
+router.post("/upload-profile-picture", authenticateUser, profileImage);
+router.get("/profile", authenticateUser, getProfile);
 
 module.exports = router;

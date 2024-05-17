@@ -39,17 +39,21 @@ const FileUploadComponent = () => {
         throw new Error("No token found");
       }
 
+      // Create a FormData object and append the file
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
       // Fetch presigned URL from backend
       const presignedUrlResponse = await axios.post(
         "http://localhost:3001/api/get-presigned-url",
-        { fileType: selectedFile.type, filename: selectedFile.name },
+        formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Include the JWT token in the request headers
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data", // Important for handling file uploads
           },
         }
       );
-      console.log(selectedFile.name);
 
       // Upload file directly to S3 using presigned URL
       await axios.put(presignedUrlResponse.data.url, selectedFile, {
@@ -102,7 +106,7 @@ const FileUploadComponent = () => {
               <h2 className="text-xl font-semibold mb-2">File Details</h2>
               <p>Name: {fileDetails.name}</p>
               <a href={fileDetails.Link} className="hover:text-gray-300">
-                <p>File Link: {fileDetails.Link} bytes</p>
+                <p>File Link: {fileDetails.Link}</p>
               </a>
               <p>Type: {fileDetails.type}</p>
             </div>
