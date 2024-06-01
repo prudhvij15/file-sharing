@@ -70,7 +70,7 @@ const ProfilePicture = () => {
           onClick={() => setShowDropdown(!showDropdown)}
         >
           {profilePicture ? (
-            <img src={profilePicture} alt="Profile" className="w-full h-full" />
+            <img src={profilePicture} alt="Profile" className="w-94  h-full" />
           ) : (
             <svg
               className="w-full h-full text-gray-300"
