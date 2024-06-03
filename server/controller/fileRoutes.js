@@ -6,6 +6,12 @@ const fileDeletion = require("./fileDeletion.js");
 const authenticateUser = require("../middleware/authMiddleware.js");
 const userAuth = require("../controller/usercontroller/userAuth.js");
 const { profileImage, profilePicture, getProfile } = require("./profile.js");
+const path = require("path");
+const fs = require("fs");
+
+// Add this line to import the generatePdfThumbnail function
+const { generatePdfThumbnail } = require("./uploadController.js");
+
 router.get("/files", authenticateUser, fileController.getFile);
 router.delete("/files/:id", authenticateUser, fileDeletion.deleteFile);
 
