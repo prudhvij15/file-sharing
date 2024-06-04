@@ -3,7 +3,7 @@
 This project is a file sharing application built using React for the frontend and Node.js with Express for the backend. The application allows users to upload files, generate thumbnails for images and PDFs, store files on AWS S3, and manage files using MongoDB.
 
 <video width="640" height="480" controls>
-  <source src="https://us-east-2.console.aws.amazon.com/s3/object/filemanager1?region=us-east-2&bucketType=general&prefix=Screen+Recording+2024-06-03+at+7.10.43%E2%80%AFPM.mov" type="video/mp4">
+  <source src="https://github.com/prudhvij15/file-sharing/blob/main/demo.m4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
