@@ -57,7 +57,7 @@ const FileList = () => {
 
   return (
     <div className="flex flex-wrap justify-start">
-      {files.map((file, index) => (
+      {files.map((file) => (
         <div
           key={file._id}
           className="bg-gray-200 rounded-md p-1 flex flex-col items-center mr-2 mb-4"
@@ -65,30 +65,36 @@ const FileList = () => {
             width: `calc(${100 / filesPerRow}% - 0.5rem)`,
           }}
         >
-          <a></a>{" "}
-          <div className="bg-white rounded-md p-1 mb-1 w-full flex flex-col justify-between">
-            <p className="text-xs truncate w-full text-center bg-gray-300 p-1 rounded-md">
-              {file.file_name}
-            </p>
-            <div className="relative flex-grow overflow-hidden">
-              {file.thumbnail_location ? (
-                <img
-                  src={file.thumbnail_location}
-                  alt={file.file_name}
-                  className="w-full h-48 object-cover rounded-md"
-                  style={{ objectPosition: "top" }}
-                />
-              ) : (
-                <div className="w-full h-auto bg-gray-300 rounded-md" />
-              )}
-              <button
-                className="absolute bottom-0 left-0 right-0 bg-gray-500 text-white rounded-full p-1 mb-1 mx-auto flex items-center justify-center"
-                onClick={(e) => handleDelete(e, file._id)}
-              >
-                <FaTrash className="text-xs" />
-              </button>
+          <a
+            href={file.file_location}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full"
+          >
+            <div className="bg-white rounded-md p-1 mb-1 w-full flex flex-col justify-between">
+              <p className="text-xs truncate w-full text-center bg-gray-300 p-1 rounded-md">
+                {file.file_name}
+              </p>
+              <div className="relative flex-grow overflow-hidden">
+                {file.thumbnail_location ? (
+                  <img
+                    src={file.thumbnail_location}
+                    alt={file.file_name}
+                    className="w-full h-48 object-cover rounded-md"
+                    style={{ objectPosition: "top" }}
+                  />
+                ) : (
+                  <div className="w-full h-auto bg-gray-300 rounded-md" />
+                )}
+                <button
+                  className="absolute bottom-0 left-0 right-0 bg-gray-500 text-white rounded-full p-1 mb-1 mx-auto flex items-center justify-center"
+                  onClick={(e) => handleDelete(e, file._id)}
+                >
+                  <FaTrash className="text-xs" />
+                </button>
+              </div>
             </div>
-          </div>
+          </a>
         </div>
       ))}
     </div>
