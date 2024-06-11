@@ -2,7 +2,7 @@
 
     This project is a file sharing application built using React for the frontend and Node.js with Express for the backend. The application allows users to upload files, generate thumbnails for images and PDFs, store files on AWS S3, and manage files using MongoDB.
 
-    ![GIF](demo.gif)
+https://github.com/prudhvij15/file-sharing/blob/main/demo.mp4
 
     ## Table of Contents
 
