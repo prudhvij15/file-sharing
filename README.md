@@ -2,7 +2,7 @@
 
     This project is a file sharing application built using React for the frontend and Node.js with Express for the backend. The application allows users to upload files, generate thumbnails for images and PDFs, store files on AWS S3, and manage files using MongoDB.
 
-https://github.com/prudhvij15/file-sharing/assets/88441748/b7ec2dd2-3f77-48f2-a887-972faf6d8acc
+
 
     ## Table of Contents
 
